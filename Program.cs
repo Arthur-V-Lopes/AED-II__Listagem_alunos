@@ -8,7 +8,6 @@
 using System;
 using System.IO;
 
-[Serializable]
 public class Disciplina
 {
     public string CodDisciplina { get; set; }
@@ -16,7 +15,6 @@ public class Disciplina
     public int NotaMin { get; set; }
 }
 
-[Serializable]
 public class Matricula
 {
     public string MatriculaAluno { get; set; }
@@ -24,8 +22,7 @@ public class Matricula
     public int Nota2 { get; set; }
 }
 
-[Serializable]
-public class Alunos
+public class Aluno
 {
     public int Matricula { get; set; }
     public string Nome { get; set; }
@@ -36,7 +33,7 @@ public static class Cadastro
 {
     // Arrays internos
     private static Disciplina[] disciplinas;
-    private static Alunos[] alunos;
+    private static Aluno[] alunos;
     private static Matricula[] matriculas;
 
     private static int contadorDisciplinas = 0;
@@ -52,8 +49,33 @@ public static class Cadastro
     public static void Inicializar(int maxDisciplinas, int maxAlunos, int maxMatriculas)
     {
         disciplinas = new Disciplina[maxDisciplinas];
-        alunos = new Alunos[maxAlunos];
+        alunos = new Aluno[maxAlunos];
         matriculas = new Matricula[maxMatriculas];
+    }
+
+    // Método auxiliar para leitura segura de inteiros
+    private static bool LerInteiro(string mensagem, out int valor)
+    {
+        Console.Write(mensagem);
+        if (!int.TryParse(Console.ReadLine(), out valor))
+        {
+            Console.WriteLine("Entrada invalida! Digite um numero inteiro.");
+            return false;
+        }
+        return true;
+    }
+
+    // Método auxiliar para leitura segura de strings não vazias
+    private static bool LerString(string mensagem, out string valor)
+    {
+        Console.Write(mensagem);
+        valor = Console.ReadLine();
+        if (string.IsNullOrWhiteSpace(valor))
+        {
+            Console.WriteLine("Entrada invalida! O campo nao pode ser vazio.");
+            return false;
+        }
+        return true;
     }
 
     // ═══════════════════════════════════════════
@@ -64,7 +86,7 @@ public static class Cadastro
     {
         if (contadorDisciplinas >= disciplinas.Length)
         {
-            Console.WriteLine("❌ Limite de disciplinas atingido!");
+            Console.WriteLine("Limite de disciplinas atingido!");
             return;
         }
 
@@ -72,73 +94,93 @@ public static class Cadastro
 
         Disciplina disciplina = new Disciplina();
 
-        Console.Write("Código da Disciplina: ");
-        disciplina.CodDisciplina = Console.ReadLine();
+        if (!LerString("Codigo da Disciplina: ", out string cod)) return;
+        disciplina.CodDisciplina = cod;
 
-        Console.Write("Nome da Disciplina: ");
-        disciplina.NomeDisciplina = Console.ReadLine();
+        if (!LerString("Nome da Disciplina: ", out string nome)) return;
+        disciplina.NomeDisciplina = nome;
 
-        Console.Write("Nota Mínima: ");
-        disciplina.NotaMin = int.Parse(Console.ReadLine());
+        if (!LerInteiro("Nota Minima: ", out int notaMin)) return;
+        if (notaMin < 0 || notaMin > 100)
+        {
+            Console.WriteLine("Nota minima deve ser entre 0 e 100.");
+            return;
+        }
+        disciplina.NotaMin = notaMin;
 
         disciplinas[contadorDisciplinas] = disciplina;
         contadorDisciplinas++;
 
-        Console.WriteLine("✓ Disciplina cadastrada com sucesso!");
+        Console.WriteLine("Disciplina cadastrada com sucesso!");
     }
 
     public static void CadastrarAluno()
     {
         if (contadorAlunos >= alunos.Length)
         {
-            Console.WriteLine("❌ Limite de alunos atingido!");
+            Console.WriteLine("Limite de alunos atingido!");
             return;
         }
 
         Console.WriteLine("\n=== CADASTRO DE ALUNO ===");
 
-        Alunos aluno = new Alunos();
+        Aluno aluno = new Aluno();
 
-        Console.Write("Matrícula: ");
-        aluno.Matricula = int.Parse(Console.ReadLine());
+        if (!LerInteiro("Matricula: ", out int matricula)) return;
+        aluno.Matricula = matricula;
 
-        Console.Write("Nome: ");
-        aluno.Nome = Console.ReadLine();
+        if (!LerString("Nome: ", out string nome)) return;
+        aluno.Nome = nome;
 
-        Console.Write("Idade: ");
-        aluno.Idade = int.Parse(Console.ReadLine());
+        if (!LerInteiro("Idade: ", out int idade)) return;
+        if (idade <= 0 || idade > 150)
+        {
+            Console.WriteLine("Idade invalida!");
+            return;
+        }
+        aluno.Idade = idade;
 
         alunos[contadorAlunos] = aluno;
         contadorAlunos++;
 
-        Console.WriteLine("✓ Aluno cadastrado com sucesso!");
+        Console.WriteLine("Aluno cadastrado com sucesso!");
     }
 
     public static void CadastrarMatricula()
     {
         if (contadorMatriculas >= matriculas.Length)
         {
-            Console.WriteLine("❌ Limite de matrículas atingido!");
+            Console.WriteLine("Limite de matriculas atingido!");
             return;
         }
 
-        Console.WriteLine("\n=== CADASTRO DE MATRÍCULA ===");
+        Console.WriteLine("\n=== CADASTRO DE MATRICULA ===");
 
         Matricula matricula = new Matricula();
 
-        Console.Write("Matrícula do Aluno: ");
-        matricula.MatriculaAluno = Console.ReadLine();
+        if (!LerString("Matricula do Aluno: ", out string matAluno)) return;
+        matricula.MatriculaAluno = matAluno;
 
-        Console.Write("Nota 1: ");
-        matricula.Nota1 = int.Parse(Console.ReadLine());
+        if (!LerInteiro("Nota 1: ", out int nota1)) return;
+        if (nota1 < 0 || nota1 > 100)
+        {
+            Console.WriteLine("Nota deve ser entre 0 e 100.");
+            return;
+        }
+        matricula.Nota1 = nota1;
 
-        Console.Write("Nota 2: ");
-        matricula.Nota2 = int.Parse(Console.ReadLine());
+        if (!LerInteiro("Nota 2: ", out int nota2)) return;
+        if (nota2 < 0 || nota2 > 100)
+        {
+            Console.WriteLine("Nota deve ser entre 0 e 100.");
+            return;
+        }
+        matricula.Nota2 = nota2;
 
         matriculas[contadorMatriculas] = matricula;
         contadorMatriculas++;
 
-        Console.WriteLine("✓ Matrícula cadastrada com sucesso!");
+        Console.WriteLine("Matricula cadastrada com sucesso!");
     }
 
     // ═══════════════════════════════════════════
@@ -155,9 +197,9 @@ public static class Cadastro
         return resultado;
     }
 
-    public static Alunos[] ObterAlunos()
+    public static Aluno[] ObterAlunos()
     {
-        Alunos[] resultado = new Alunos[contadorAlunos];
+        Aluno[] resultado = new Aluno[contadorAlunos];
         for (int i = 0; i < contadorAlunos; i++)
         {
             resultado[i] = alunos[i];
@@ -186,10 +228,8 @@ public static class Cadastro
             using (FileStream fs = new FileStream(ARQUIVO_DISCIPLINAS, FileMode.Create))
             using (BinaryWriter writer = new BinaryWriter(fs))
             {
-                // Salvar contador
                 writer.Write(contadorDisciplinas);
 
-                // Salvar cada disciplina
                 for (int i = 0; i < contadorDisciplinas; i++)
                 {
                     writer.Write(disciplinas[i].CodDisciplina);
@@ -198,11 +238,11 @@ public static class Cadastro
                 }
             }
 
-            Console.WriteLine($"✓ {contadorDisciplinas} disciplinas salvas em '{ARQUIVO_DISCIPLINAS}'");
+            Console.WriteLine($"{contadorDisciplinas} disciplinas salvas em '{ARQUIVO_DISCIPLINAS}'");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"❌ Erro ao salvar disciplinas: {ex.Message}");
+            Console.WriteLine($"Erro ao salvar disciplinas: {ex.Message}");
         }
     }
 
@@ -213,10 +253,8 @@ public static class Cadastro
             using (FileStream fs = new FileStream(ARQUIVO_ALUNOS, FileMode.Create))
             using (BinaryWriter writer = new BinaryWriter(fs))
             {
-                // Salvar contador
                 writer.Write(contadorAlunos);
 
-                // Salvar cada aluno
                 for (int i = 0; i < contadorAlunos; i++)
                 {
                     writer.Write(alunos[i].Matricula);
@@ -225,11 +263,11 @@ public static class Cadastro
                 }
             }
 
-            Console.WriteLine($"✓ {contadorAlunos} alunos salvos em '{ARQUIVO_ALUNOS}'");
+            Console.WriteLine($"{contadorAlunos} alunos salvos em '{ARQUIVO_ALUNOS}'");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"❌ Erro ao salvar alunos: {ex.Message}");
+            Console.WriteLine($"Erro ao salvar alunos: {ex.Message}");
         }
     }
 
@@ -240,10 +278,8 @@ public static class Cadastro
             using (FileStream fs = new FileStream(ARQUIVO_MATRICULAS, FileMode.Create))
             using (BinaryWriter writer = new BinaryWriter(fs))
             {
-                // Salvar contador
                 writer.Write(contadorMatriculas);
 
-                // Salvar cada matrícula
                 for (int i = 0; i < contadorMatriculas; i++)
                 {
                     writer.Write(matriculas[i].MatriculaAluno);
@@ -252,22 +288,21 @@ public static class Cadastro
                 }
             }
 
-            Console.WriteLine($"✓ {contadorMatriculas} matrículas salvas em '{ARQUIVO_MATRICULAS}'");
+            Console.WriteLine($"{contadorMatriculas} matriculas salvas em '{ARQUIVO_MATRICULAS}'");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"❌ Erro ao salvar matrículas: {ex.Message}");
+            Console.WriteLine($"Erro ao salvar matriculas: {ex.Message}");
         }
     }
 
-    // Salvar todos os arquivos de uma vez
     public static void SalvarTodos()
     {
-        Console.WriteLine("\n💾 Salvando todos os dados...");
+        Console.WriteLine("\nSalvando todos os dados...");
         SalvarDisciplinas();
         SalvarAlunos();
         SalvarMatriculas();
-        Console.WriteLine("✓ Todos os dados foram salvos com sucesso!\n");
+        Console.WriteLine("Todos os dados foram salvos com sucesso!\n");
     }
 
     // ═══════════════════════════════════════════
@@ -280,17 +315,15 @@ public static class Cadastro
         {
             if (!File.Exists(ARQUIVO_DISCIPLINAS))
             {
-                Console.WriteLine($"⚠ Arquivo '{ARQUIVO_DISCIPLINAS}' não encontrado.");
+                Console.WriteLine($"Arquivo '{ARQUIVO_DISCIPLINAS}' nao encontrado.");
                 return;
             }
 
             using (FileStream fs = new FileStream(ARQUIVO_DISCIPLINAS, FileMode.Open))
             using (BinaryReader reader = new BinaryReader(fs))
             {
-                // Carregar contador
                 contadorDisciplinas = reader.ReadInt32();
 
-                // Carregar cada disciplina
                 for (int i = 0; i < contadorDisciplinas; i++)
                 {
                     disciplinas[i] = new Disciplina
@@ -302,11 +335,11 @@ public static class Cadastro
                 }
             }
 
-            Console.WriteLine($"✓ {contadorDisciplinas} disciplinas carregadas de '{ARQUIVO_DISCIPLINAS}'");
+            Console.WriteLine($"{contadorDisciplinas} disciplinas carregadas de '{ARQUIVO_DISCIPLINAS}'");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"❌ Erro ao carregar disciplinas: {ex.Message}");
+            Console.WriteLine($"Erro ao carregar disciplinas: {ex.Message}");
         }
     }
 
@@ -316,20 +349,18 @@ public static class Cadastro
         {
             if (!File.Exists(ARQUIVO_ALUNOS))
             {
-                Console.WriteLine($"⚠ Arquivo '{ARQUIVO_ALUNOS}' não encontrado.");
+                Console.WriteLine($"Arquivo '{ARQUIVO_ALUNOS}' nao encontrado.");
                 return;
             }
 
             using (FileStream fs = new FileStream(ARQUIVO_ALUNOS, FileMode.Open))
             using (BinaryReader reader = new BinaryReader(fs))
             {
-                // Carregar contador
                 contadorAlunos = reader.ReadInt32();
 
-                // Carregar cada aluno
                 for (int i = 0; i < contadorAlunos; i++)
                 {
-                    alunos[i] = new Alunos
+                    alunos[i] = new Aluno
                     {
                         Matricula = reader.ReadInt32(),
                         Nome = reader.ReadString(),
@@ -338,11 +369,11 @@ public static class Cadastro
                 }
             }
 
-            Console.WriteLine($"✓ {contadorAlunos} alunos carregados de '{ARQUIVO_ALUNOS}'");
+            Console.WriteLine($"{contadorAlunos} alunos carregados de '{ARQUIVO_ALUNOS}'");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"❌ Erro ao carregar alunos: {ex.Message}");
+            Console.WriteLine($"Erro ao carregar alunos: {ex.Message}");
         }
     }
 
@@ -352,17 +383,15 @@ public static class Cadastro
         {
             if (!File.Exists(ARQUIVO_MATRICULAS))
             {
-                Console.WriteLine($"⚠ Arquivo '{ARQUIVO_MATRICULAS}' não encontrado.");
+                Console.WriteLine($"Arquivo '{ARQUIVO_MATRICULAS}' nao encontrado.");
                 return;
             }
 
             using (FileStream fs = new FileStream(ARQUIVO_MATRICULAS, FileMode.Open))
             using (BinaryReader reader = new BinaryReader(fs))
             {
-                // Carregar contador
                 contadorMatriculas = reader.ReadInt32();
 
-                // Carregar cada matrícula
                 for (int i = 0; i < contadorMatriculas; i++)
                 {
                     matriculas[i] = new Matricula
@@ -374,22 +403,21 @@ public static class Cadastro
                 }
             }
 
-            Console.WriteLine($"✓ {contadorMatriculas} matrículas carregadas de '{ARQUIVO_MATRICULAS}'");
+            Console.WriteLine($"{contadorMatriculas} matriculas carregadas de '{ARQUIVO_MATRICULAS}'");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"❌ Erro ao carregar matrículas: {ex.Message}");
+            Console.WriteLine($"Erro ao carregar matriculas: {ex.Message}");
         }
     }
 
-    // Carregar todos os arquivos de uma vez
     public static void CarregarTodos()
     {
-        Console.WriteLine("\n📂 Carregando dados salvos...");
+        Console.WriteLine("\nCarregando dados salvos...");
         CarregarDisciplinas();
         CarregarAlunos();
         CarregarMatriculas();
-        Console.WriteLine("✓ Carregamento concluído!\n");
+        Console.WriteLine("Carregamento concluido!\n");
     }
 }
 
@@ -408,26 +436,41 @@ public class Program
 
         while (continuar)
         {
-            Console.Clear();
-            Console.WriteLine("╔════════════════════════════════════╗");
-            Console.WriteLine("║   SISTEMA ACADÊMICO - MENU         ║");
-            Console.WriteLine("╚════════════════════════════════════╝");
-            Console.WriteLine("1  - Cadastrar Disciplina\n");
-            Console.WriteLine("2  - Cadastrar Aluno\n");
-            Console.WriteLine("3  - Cadastrar Matrícula\n");
-            Console.WriteLine("4  - Consultar Dados\n");
-            Console.WriteLine("5  - Salvar Disciplinas\n");
-            Console.WriteLine("6  - Salvar Alunos\n");
-            Console.WriteLine("7  - Salvar Matrículas\n");
-            Console.WriteLine("8  - Salvar Todos\n");
-            Console.WriteLine("9  - Carregar Disciplinas\n");
-            Console.WriteLine("10 - Carregar Alunos\n");
-            Console.WriteLine("11 - Carregar Matrículas\n");
-            Console.WriteLine("12 - Carregar Todos\n");
-            Console.WriteLine("0  - Sair\n");
-            Console.Write("\nEscolha uma opção: ");
+            try
+            {
+                Console.Clear();
+            }
+            catch
+            {
+                // Ignora erro caso o terminal não suporte Clear
+            }
 
-            int opcao = int.Parse(Console.ReadLine());
+            Console.WriteLine("========================================");
+            Console.WriteLine("   SISTEMA ACADEMICO - MENU             ");
+            Console.WriteLine("========================================");
+            Console.WriteLine("1  - Cadastrar Disciplina");
+            Console.WriteLine("2  - Cadastrar Aluno");
+            Console.WriteLine("3  - Cadastrar Matricula");
+            Console.WriteLine("4  - Consultar Dados");
+            Console.WriteLine("5  - Salvar Disciplinas");
+            Console.WriteLine("6  - Salvar Alunos");
+            Console.WriteLine("7  - Salvar Matriculas");
+            Console.WriteLine("8  - Salvar Todos");
+            Console.WriteLine("9  - Carregar Disciplinas");
+            Console.WriteLine("10 - Carregar Alunos");
+            Console.WriteLine("11 - Carregar Matriculas");
+            Console.WriteLine("12 - Carregar Todos");
+            Console.WriteLine("0  - Sair");
+            Console.Write("\nEscolha uma opcao: ");
+
+            int opcao;
+            if (!int.TryParse(Console.ReadLine(), out opcao))
+            {
+                Console.WriteLine("Opcao invalida! Digite um numero.");
+                Console.Write("\nPressione ENTER para continuar...");
+                Console.ReadLine();
+                continue;
+            }
 
             switch (opcao)
             {
@@ -480,18 +523,18 @@ public class Program
                     break;
 
                 case 0:
-                    Console.Write("\n💾 Deseja salvar antes de sair? (S/N): ");
-                    string resposta = Console.ReadLine().ToUpper();
-                    if (resposta == "S")
+                    Console.Write("\nDeseja salvar antes de sair? (S/N): ");
+                    string resposta = Console.ReadLine();
+                    if (resposta != null && resposta.Trim().ToUpper() == "S")
                     {
                         Cadastro.SalvarTodos();
                     }
                     continuar = false;
-                    Console.WriteLine("\n👋 Até logo!");
+                    Console.WriteLine("\nAte logo!");
                     break;
 
                 default:
-                    Console.WriteLine("\n❌ Opção inválida!");
+                    Console.WriteLine("\nOpcao invalida!");
                     break;
             }
 
@@ -505,42 +548,58 @@ public class Program
 
     static void MenuConsulta()
     {
-        Console.Clear();
-        Console.WriteLine("\n╔════════════════════════════════════╗");
-        Console.WriteLine("║         CONSULTAR DADOS            ║");
-        Console.WriteLine("╚════════════════════════════════════╝");
+        try
+        {
+            Console.Clear();
+        }
+        catch { }
+
+        Console.WriteLine("\n========================================");
+        Console.WriteLine("         CONSULTAR DADOS                ");
+        Console.WriteLine("========================================");
         Console.WriteLine("1 - Listar Disciplinas");
         Console.WriteLine("2 - Listar Alunos");
-        Console.WriteLine("3 - Listar Matrículas");
+        Console.WriteLine("3 - Listar Matriculas");
         Console.Write("Escolha: ");
 
-        int opcao = int.Parse(Console.ReadLine());
+        int opcao;
+        if (!int.TryParse(Console.ReadLine(), out opcao))
+        {
+            Console.WriteLine("Opcao invalida!");
+            return;
+        }
 
         if (opcao == 1)
         {
             Disciplina[] disciplinas = Cadastro.ObterDisciplinas();
-            Console.WriteLine($"\n╔════════════════════════════════════╗");
-            Console.WriteLine($"║  {disciplinas.Length} DISCIPLINAS CADASTRADAS");
-            Console.WriteLine($"╚════════════════════════════════════╝");
+            Console.WriteLine($"\n=== {disciplinas.Length} DISCIPLINAS CADASTRADAS ===");
+
+            if (disciplinas.Length == 0)
+            {
+                Console.WriteLine("Nenhuma disciplina cadastrada.");
+            }
 
             for (int i = 0; i < disciplinas.Length; i++)
             {
-                Console.WriteLine($"\n{i + 1}. Código: {disciplinas[i].CodDisciplina}");
+                Console.WriteLine($"\n{i + 1}. Codigo: {disciplinas[i].CodDisciplina}");
                 Console.WriteLine($"   Nome: {disciplinas[i].NomeDisciplina}");
-                Console.WriteLine($"   Nota Mínima: {disciplinas[i].NotaMin}");
+                Console.WriteLine($"   Nota Minima: {disciplinas[i].NotaMin}");
                 Console.WriteLine("   " + new string('-', 35));
             }
         }
         else if (opcao == 2)
         {
-            Alunos[] alunos = Cadastro.ObterAlunos();
-            Console.WriteLine($"\n╔════════════════════════════════════╗");
-            Console.WriteLine($"║  {alunos.Length} ALUNOS CADASTRADOS");
-            Console.WriteLine($"╚════════════════════════════════════╝");
+            Aluno[] alunos = Cadastro.ObterAlunos();
+            Console.WriteLine($"\n=== {alunos.Length} ALUNOS CADASTRADOS ===");
+
+            if (alunos.Length == 0)
+            {
+                Console.WriteLine("Nenhum aluno cadastrado.");
+            }
 
             for (int i = 0; i < alunos.Length; i++)
             {
-                Console.WriteLine($"\n{i + 1}. Matrícula: {alunos[i].Matricula}");
+                Console.WriteLine($"\n{i + 1}. Matricula: {alunos[i].Matricula}");
                 Console.WriteLine($"   Nome: {alunos[i].Nome}");
                 Console.WriteLine($"   Idade: {alunos[i].Idade} anos");
                 Console.WriteLine("   " + new string('-', 35));
@@ -549,18 +608,25 @@ public class Program
         else if (opcao == 3)
         {
             Matricula[] matriculas = Cadastro.ObterMatriculas();
-            Console.WriteLine($"\n╔════════════════════════════════════╗");
-            Console.WriteLine($"║  {matriculas.Length} MATRÍCULAS CADASTRADAS");
-            Console.WriteLine($"╚════════════════════════════════════╝");
+            Console.WriteLine($"\n=== {matriculas.Length} MATRICULAS CADASTRADAS ===");
+
+            if (matriculas.Length == 0)
+            {
+                Console.WriteLine("Nenhuma matricula cadastrada.");
+            }
 
             for (int i = 0; i < matriculas.Length; i++)
             {
-                Console.WriteLine($"\n{i + 1}. Matrícula: {matriculas[i].MatriculaAluno}");
+                Console.WriteLine($"\n{i + 1}. Matricula: {matriculas[i].MatriculaAluno}");
                 Console.WriteLine($"   Nota 1: {matriculas[i].Nota1}");
                 Console.WriteLine($"   Nota 2: {matriculas[i].Nota2}");
-                Console.WriteLine($"   Média: {(matriculas[i].Nota1 + matriculas[i].Nota2) / 2.0:F1}");
+                Console.WriteLine($"   Media: {(matriculas[i].Nota1 + matriculas[i].Nota2) / 2.0:F1}");
                 Console.WriteLine("   " + new string('-', 35));
             }
+        }
+        else
+        {
+            Console.WriteLine("Opcao invalida!");
         }
     }
 }
